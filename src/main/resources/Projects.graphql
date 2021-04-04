@@ -1,0 +1,40 @@
+query Projects($login: String!, $number: Int!) {
+  viewer {
+    organization(login: $login) {
+      project(number: $number) {
+        columns(last: 10) {
+          edges {
+            node {
+              name
+              cards(archivedStates: [NOT_ARCHIVED]) {
+                edges {
+                  node {
+                    content {
+                      ... on Issue {
+                        __typename
+                        id
+                        body
+                      }
+                      ...on PullRequest {
+                        __typename
+                        id
+                        title
+                        labels(first:10) {
+                          edges {
+                            node {
+                              name
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
