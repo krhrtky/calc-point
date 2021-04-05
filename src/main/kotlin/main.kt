@@ -1,6 +1,7 @@
 import com.expediagroup.graphql.client.jackson.GraphQLClientJacksonSerializer
 import com.expediagroup.graphql.client.ktor.GraphQLKtorClient
 import generated.Projects
+import generated.projects.Issue
 import generated.projects.PullRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
@@ -13,9 +14,9 @@ import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.required
 import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
 import java.lang.NumberFormatException
 import java.net.URL
-import org.slf4j.LoggerFactory
 
 fun main(args: Array<String>) {
     val log = LoggerFactory.getLogger("App")
@@ -62,7 +63,7 @@ fun main(args: Array<String>) {
         ?: System.getenv("ORG_GRADLE_PROJECT_githubToken")
         ?: ""
 
-    if(githubToken.isEmpty()) {
+    if (githubToken.isEmpty()) {
         log.error("GitHub API token is blank. Set the value in one of the following ways. Show detail option help(-h).")
         return
     }
@@ -104,9 +105,12 @@ fun main(args: Array<String>) {
             .mapNotNull {
                 it?.node?.content
             }
-            .filterIsInstance<PullRequest>()
             .mapNotNull {
-                it.labels?.edges
+                when (it) {
+                    is Issue -> it.labels?.edges
+                    is PullRequest -> it.labels?.edges
+                    else -> null
+                }
             }
             .flatten()
 

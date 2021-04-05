@@ -13,9 +13,16 @@ query Projects($login: String!, $number: Int!) {
                       ... on Issue {
                         __typename
                         id
-                        body
+                        title
+                        labels(first:10) {
+                          edges {
+                            node {
+                              name
+                            }
+                          }
+                        }
                       }
-                      ...on PullRequest {
+                      ... on PullRequest {
                         __typename
                         id
                         title
